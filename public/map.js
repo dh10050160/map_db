@@ -27,7 +27,7 @@ caseSelect.addEventListener('change', function(){
 
     //     const resultRows = data.resultRows;
     //     const detailsData = data.detailsData;
-    
+
     // 延遲 fetch 請求，等待其他事件處理完成
     setTimeout(function () {
         fetch(`/spatial?region=${selectedRegion}&case=${selectedCase}`)
@@ -105,13 +105,25 @@ caseSelect.addEventListener('change', function(){
             Object.keys(caseseqGroups).forEach(caseseq => {
                 // 找到相應的 feature 對象
                 const correspondingFeature = detailsData.find(feature => feature.caseseq === parseInt(caseseq));
-                // 獲取 casename 和 color
-                // const casename = correspondingFeature ? correspondingFeature.casename : `Case ${caseseq}`;
-                // const color = getColorForCase(caseseq);  // 這裡應根據 caseseq 獲取顏色的方法，可以自己實現
+                // 獲取 casename
                 const casename = correspondingFeature ? correspondingFeature.casename : `Case ${caseseq}`;
-                // 添加 GeoJSON 圖層到 featureGroup
-                // layerControl.addOverlay(caseseqGroups[caseseq], `red: ${casename}`);
-                layerControl.addOverlay(caseseqGroups[caseseq], casename);
+                // 獲取 color
+                let casecolor;
+                if (correspondingFeature && correspondingFeature.caseseq == selectedCase){
+                    casecolor = 'Red';
+                } else if (correspondingFeature && correspondingFeature.caseseq == detailsData[1].caseseq){
+                    casecolor = 'Orange';
+                } else if (correspondingFeature && correspondingFeature.caseseq == detailsData[2].caseseq){
+                    casecolor = 'Blue';
+                } else if (correspondingFeature && correspondingFeature.caseseq == detailsData[3].caseseq){
+                    casecolor = 'Green';
+                } else {
+                    casecolor = 'Gray'; // 預設為灰色
+                    console.log("feature.caseseq: "+correspondingFeature.caseseq);
+                }
+                console.log("casecolor: "+casecolor);
+
+                layerControl.addOverlay(caseseqGroups[caseseq],casecolor+": "+casename);
             });
     // }catch(error){
     //     console.error('Error fetching cases', error);
