@@ -15,96 +15,109 @@ var layerControl = L.control.layers(baseMaps).addTo(map);//https://leafletjs.com
 const regionSelect = document.getElementById('Region');
 const caseSelect = document.getElementById('Case');
 
-caseSelect.addEventListener('change',function(){
+caseSelect.addEventListener('change', function(){
+    //async
     initMAP();
     const selectedRegion = regionSelect.value;
     const selectedCase = caseSelect.value;
 
-    fetch(`/spatial?region=${selectedRegion}&case=${selectedCase}`)
-    .then(response => response.json())
-    .then(data => {
-        const resultRows = data.resultRows;
-        const detailsData = data.detailsData;
+    // try{
+    //     const response = await fetch(`/spatial?region=${selectedRegion}&case=${selectedCase}`);
+    //     const data = await response.json();
 
-        // 創建一個物件來存儲各個 caseseq 的 featureGroup
-        const caseseqGroups = {};
+    //     const resultRows = data.resultRows;
+    //     const detailsData = data.detailsData;
+    
+    // 延遲 fetch 請求，等待其他事件處理完成
+    setTimeout(function () {
+        fetch(`/spatial?region=${selectedRegion}&case=${selectedCase}`)
+        .then(response => response.json())
+        .then(data => {
+            const resultRows = data.resultRows;
+            const detailsData = data.detailsData;
 
-        //將空間數據加到地圖
-        resultRows.forEach((feature, index) => {
+            // 創建一個物件來存儲各個 caseseq 的 featureGroup
+            const caseseqGroups = {};
 
-            const geometry = JSON.parse(feature.geomjson);
-            let color;
-            // 根據 case 設置不同的顏色
-            if (feature.caseseq == selectedCase){
-                color = 'red';
-            }else if (feature.caseseq == detailsData[1].caseseq){
-                color = 'orange';
-            }else if (feature.caseseq == detailsData[2].caseseq){
-                color = 'blue';
-            }else if (feature.caseseq == detailsData[3].caseseq){
-                color = 'green';
-            }else {
-                color = 'gray'; // 預設為灰色
-                console.log("feature.caseseq: "+feature.caseseq);
-            }
-            /*方法1*/
-            // let tag = feature.tag;
-            // L.geoJSON(geometry, {
-            //     style: {
-            //         color: color,
-            //         weight: 2,
-            //         opacity: 1
-            //     },
-            //     onEachFeature: function (feature, layer) {
-            //         // 為每個圖層添加點擊事件
-            //         // console.log("feature.tag: "+feature.tag); // undefined
-            //         layer.on('click', function (e) {
-            //             // 使用 openPopup() 顯示 tag
-            //             layer.bindPopup(tag).openPopup();
-            //         });
-            //     }
-            // }).addTo(map);
+            //將空間數據加到地圖
+            resultRows.forEach((feature, index) => {
 
-            // 如果還沒有為該 caseseq 創建 featureGroup，就創建一個
-            if (!caseseqGroups[feature.caseseq]) {
-                caseseqGroups[feature.caseseq] = L.featureGroup.subGroup();
-                // 將 featureGroup 添加到地圖
-                caseseqGroups[feature.caseseq].addTo(map);
-            }
-
-            /*方法2*/
-            const geoJSONLayer = L.geoJSON(geometry, {
-                style: {
-                    color: color,
-                    weight: 2,
-                    opacity: 1
+                const geometry = JSON.parse(feature.geomjson);
+                let color;
+                // 根據 case 設置不同的顏色
+                if (feature.caseseq == selectedCase){
+                    color = 'red';
+                }else if (feature.caseseq == detailsData[1].caseseq){
+                    color = 'orange';
+                }else if (feature.caseseq == detailsData[2].caseseq){
+                    color = 'blue';
+                }else if (feature.caseseq == detailsData[3].caseseq){
+                    color = 'green';
+                }else {
+                    color = 'gray'; // 預設為灰色
+                    console.log("feature.caseseq: "+feature.caseseq);
                 }
-            }).bindPopup(feature.tag)
-                // function (layer) {
-                // console.log("layer.feature.properties.description: "+feature.tag);    
-                // return feature.tag;
-                // })
-            ;
+                /*方法1*/
+                // let tag = feature.tag;
+                // L.geoJSON(geometry, {
+                //     style: {
+                //         color: color,
+                //         weight: 2,
+                //         opacity: 1
+                //     },
+                //     onEachFeature: function (feature, layer) {
+                //         // 為每個圖層添加點擊事件
+                //         // console.log("feature.tag: "+feature.tag); // undefined
+                //         layer.on('click', function (e) {
+                //             // 使用 openPopup() 顯示 tag
+                //             layer.bindPopup(tag).openPopup();
+                //         });
+                //     }
+                // }).addTo(map);
 
-            // 添加 GeoJSON 圖層到 featureGroup
-            geoJSONLayer.addTo(caseseqGroups[feature.caseseq]);
+                // 如果還沒有為該 caseseq 創建 featureGroup，就創建一個
+                if (!caseseqGroups[feature.caseseq]) {
+                    caseseqGroups[feature.caseseq] = L.featureGroup.subGroup();
+                    // 將 featureGroup 添加到地圖
+                    caseseqGroups[feature.caseseq].addTo(map);
+                }
 
+                /*方法2*/
+                const geoJSONLayer = L.geoJSON(geometry, {
+                    style: {
+                        color: color,
+                        weight: 2,
+                        opacity: 1
+                    }
+                }).bindPopup(feature.tag)
+                    // function (layer) {
+                    // console.log("layer.feature.properties.description: "+feature.tag);    
+                    // return feature.tag;
+                    // })
+                ;
+
+                // 添加 GeoJSON 圖層到 featureGroup
+                geoJSONLayer.addTo(caseseqGroups[feature.caseseq]);
+
+            });
+
+            // 將每個 caseseq 的 featureGroup 添加到 Layer Control
+            Object.keys(caseseqGroups).forEach(caseseq => {
+                // 找到相應的 feature 對象
+                const correspondingFeature = detailsData.find(feature => feature.caseseq === parseInt(caseseq));
+                // 獲取 casename 和 color
+                // const casename = correspondingFeature ? correspondingFeature.casename : `Case ${caseseq}`;
+                // const color = getColorForCase(caseseq);  // 這裡應根據 caseseq 獲取顏色的方法，可以自己實現
+                const casename = correspondingFeature ? correspondingFeature.casename : `Case ${caseseq}`;
+                // 添加 GeoJSON 圖層到 featureGroup
+                // layerControl.addOverlay(caseseqGroups[caseseq], `red: ${casename}`);
+                layerControl.addOverlay(caseseqGroups[caseseq], casename);
+            });
+    // }catch(error){
+    //     console.error('Error fetching cases', error);
+    // }
         });
-
-        // 將每個 caseseq 的 featureGroup 添加到 Layer Control
-        Object.keys(caseseqGroups).forEach(caseseq => {
-            // 找到相應的 feature 對象
-            const correspondingFeature = detailsData.find(feature => feature.caseseq === parseInt(caseseq));
-            // 獲取 casename 和 color
-            // const casename = correspondingFeature ? correspondingFeature.casename : `Case ${caseseq}`;
-            // const color = getColorForCase(caseseq);  // 這裡應根據 caseseq 獲取顏色的方法，可以自己實現
-            const casename = correspondingFeature ? correspondingFeature.casename : `Case ${caseseq}`;
-            // 添加 GeoJSON 圖層到 featureGroup
-            // layerControl.addOverlay(caseseqGroups[caseseq], `red: ${casename}`);
-            layerControl.addOverlay(caseseqGroups[caseseq], casename);
-        });
-
-    });
+    }, 100); // 這裡的 1000 表示延遲 1 秒，您可以根據實際需要調整延遲時間
 });
 
 regionSelect.addEventListener('change',initMAP);

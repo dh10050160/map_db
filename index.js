@@ -7,7 +7,7 @@ const port = process.env.PORT || 5000; //heroku
 // 配置 PostgreSQL 連接(localhost)
 // const pool = new Pool({
 //     user: 'ann',
-//     host: 'localhost',
+//     host: '150.116.67.217',
 //     database: 'flood',
 //     password: '0000',
 //     port: 5432, // PostgreSQL port
@@ -91,7 +91,7 @@ app.get('/details', async (req, res) => {
 app.get('/spatial', async (req, res) => {
     try {
         // 等待 detailsData 數據更新
-        await new Promise(resolve => setTimeout(resolve, 100)); // 延遲 100 毫秒
+        await new Promise(resolve => setTimeout(resolve, 200)); // 延遲 ? 毫秒
 
         const selectedRegion = req.query.region;
         // const selectedCase = req.query.case;
