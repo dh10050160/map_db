@@ -102,17 +102,41 @@ regionSelect.addEventListener('change', function () {
         .catch(error => console.error('Error fetching cases', error));
 });
 
+// Event listener for compare mode selection
+const compareRadioButtons = document.getElementsByName('compare');
+
+compareRadioButtons.forEach(button => {
+    button.addEventListener('change', function () {
+        const selectedRegion = regionSelect.value;
+        const selectedCase = caseSelect.value;
+
+        // Fetch details for the selected case in the selected region with the new compare mode
+        fetch(`/details?region=${selectedRegion}&case=${selectedCase}&compare=${button.value}`)
+            .then(response => response.json())
+            .then(details => {
+                // Update your page content, e.g., table and chart
+
+                // Trigger the spatial event
+                caseSelect.dispatchEvent(new Event('change'));
+            })
+            .catch(error => console.error('Error fetching case details', error));
+    });
+});
+
 // Event listener for case selection
 caseSelect.addEventListener('change', function () {
     const selectedRegion = regionSelect.value;
     const selectedCase = caseSelect.value;
+    const selectedRadio = document.querySelector('input[name="compare"]:checked').value;
     // console.log("selectedRegion: "+selectedRegion);
     // console.log("selectedCase: "+selectedCase);
-    
+    // console.log("selectedRadio: "+selectedRadio);
+
     const table = document.querySelector(".table")
     initTableAndChart(table,myChart);
+
     // Fetch details for the selected case in the selected region
-    fetch(`/details?region=${selectedRegion}&case=${selectedCase}`)
+    fetch(`/details?region=${selectedRegion}&case=${selectedCase}&compare=${selectedRadio}`)
         .then(response => response.json())
         .then(details => {
             // console.log(details);

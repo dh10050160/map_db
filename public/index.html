@@ -55,6 +55,19 @@
                         <option selected>Choose Case</option>
                     </select>
                 </div>
+                    <p style="margin-bottom: 5px;margin-top: 10px;"><strong>選擇比較方式:</strong></p>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="compare" id="hr24" value="hr24" checked>
+                        <label class="form-check-label" for="hr24">24小時累積雨量</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="compare" id="hr6" value="hr6">
+                        <label class="form-check-label" for="hr6">6小時累積雨量</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="compare" id="location" value="location" disabled>
+                        <label class="form-check-label" for="location">雨量站位置</label>
+                    </div>
                 <div class="row" style="padding-top: 12px;padding-bottom: 1px;">
                     <canvas id="myChart"
                         style="height: 300px;padding-right: 5px;padding-left: 0px; background-color: #e3f2fd;"></canvas>

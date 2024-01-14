@@ -3,7 +3,8 @@ const { Pool } = require('pg'); // import pg module
 const app = express(); // initialize express
 // const port = 3000; //localhost
 const port = process.env.PORT || 5000; //heroku
-
+// const port = 8080;
+const host = 'localhost';
 // 配置 PostgreSQL 連接(localhost)
 // const pool = new Pool({
 //     user: 'ann',
@@ -12,7 +13,7 @@ const port = process.env.PORT || 5000; //heroku
 //     password: '0000',
 //     port: 5432, // PostgreSQL port
 // });
-
+// const host = '34.16.148.196';
 // 配置 PostgreSQL 連接(gcp)
 const pool = new Pool({
     user: 'postgres',
@@ -62,19 +63,33 @@ app.get('/details', async (req, res) => {
     try {
         const selectedRegion = req.query.region;
         const selectedCase = req.query.case;
+        // Get the value of the selected radio button
+        const selectedRadio = req.query.compare;
+        // console.log("selectedRadio: "+selectedRadio);
+        let viewName;
+        // Determine the view based on the selected radio button
+        if (selectedRadio === 'hr6') {
+            viewName = 'view_6hr_max';
+        } else if (selectedRadio === 'hr24') {
+            viewName = 'view_24hr_max';
+        } else {
+            // Default to 'view_24hr_max' if no radio button is selected or 'hr24' is selected
+            viewName = 'view_24hr_max';
+        }
+        // console.log("viewName: "+viewName);
         const result = await pool.query(`
-            SELECT view_24hr_max.casename,view_24hr_max.caseseq, hr1, hr3, hr6, hr12, hr24,depth,ROUND((R1.ha::NUMERIC),1) AS ha, view_24hr_max.regioncode AS region
-            FROM view_24hr_max,floodcase,(
+            SELECT ${viewName}.casename,${viewName}.caseseq, hr1, hr3, hr6, hr12, hr24,depth,ROUND((R1.ha::NUMERIC),1) AS ha, ${viewName}.regioncode AS region
+            FROM ${viewName},floodcase,(
                 SELECT regioncode,floodarea.caseseq,sum(ST_Area(geom::geography))/10000 as ha
                 FROM floodarea
                 GROUP BY regioncode,caseseq
                 ORDER BY regioncode,caseseq) R1
-            WHERE  view_24hr_max.caseseq = floodcase.seq
-            AND R1.regioncode = view_24hr_max.regioncode
-            AND R1.caseseq = view_24hr_max.caseseq
-            AND view_24hr_max.regioncode = $1
-            AND view_24hr_max.caseseq <= $2
-            ORDER BY ABS(hr24 - (SELECT hr24 FROM view_24hr_max WHERE regioncode = $1 AND caseseq = $2 ))
+            WHERE  ${viewName}.caseseq = floodcase.seq
+            AND R1.regioncode = ${viewName}.regioncode
+            AND R1.caseseq = ${viewName}.caseseq
+            AND ${viewName}.regioncode = $1
+            AND ${viewName}.caseseq <= $2
+            ORDER BY ABS(hr24 - (SELECT hr24 FROM ${viewName} WHERE regioncode = $1 AND caseseq = $2 ))
             LIMIT 4;
         `, [selectedRegion, selectedCase]);
 
@@ -115,5 +130,5 @@ app.get('/spatial', async (req, res) => {
 });
 
 app.listen(port, () => {
-    console.log(`Server is running at http://localhost:${port}`); //localhost
+    console.log(`Server is running at http://${host}:${port}`); //localhost
 });
