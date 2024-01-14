@@ -2,9 +2,8 @@ const express = require('express'); // import express
 const { Pool } = require('pg'); // import pg module
 const app = express(); // initialize express
 // const port = 3000; //localhost
-const port = process.env.PORT || 5000; //heroku
-// const port = 8080;
-const host = 'localhost';
+// const port = process.env.PORT || 5000; //heroku
+// const host = 'localhost';
 // 配置 PostgreSQL 連接(localhost)
 // const pool = new Pool({
 //     user: 'ann',
@@ -13,7 +12,8 @@ const host = 'localhost';
 //     password: '0000',
 //     port: 5432, // PostgreSQL port
 // });
-// const host = '34.16.148.196';
+const host = '34.16.148.196';
+const port = 8080;
 // 配置 PostgreSQL 連接(gcp)
 const pool = new Pool({
     user: 'postgres',
