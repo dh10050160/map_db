@@ -28,7 +28,7 @@
 </head>
 
 <body><!--style="background-color: #A5B8D8;"-->
-    <div class="container" style="margin-left: auto;margin-right: auto;">
+    <div class="container-fluid" style="margin-left: auto;margin-right: auto;">
         <div class="row">
             <nav class="navbar navbar-light " style="background-color: #e3f2fd;">
                 <div class="container-fluid" style="padding-right: 0px;">
@@ -41,19 +41,23 @@
             </nav>
         </div>
         <div class="row">
-            <div class="col-md-8 col-sm-12 mobile" style="height:90vh;padding-top: 12px;"><!--flex: auto;-->
+            <div class="col-md-7 col-sm-12 mobile" style="height:90vh;padding-top: 12px;"><!--flex: auto;-->
                 <div id="map"></div>
             </div>
-            <div class="col-md-4 col-sm-12">
+            <div class="col-md-5 col-sm-12">
                 <div class="row" style="margin-bottom: 12px;margin-top: 12px;">
+                    <!-- 將兩個下拉選單放在同一行 -->
+                    <div class="col-md-6">
                     <select class="form-select" aria-label="Default select example" id="Region">
                         <option selected>Choose Region</option>
                     </select>
-                </div>
-                <div class="row">
+                    </div>
+                <!-- <div class="row"> -->
+                    <div class="col-md-6">
                     <select class="form-select" aria-label="Default select example" id="Case">
                         <option selected>Choose Case</option>
                     </select>
+                    </div>
                 </div>
                     <p style="margin-bottom: 5px;margin-top: 10px;"><strong>選擇比較方式:</strong></p>
                     <div class="form-check form-check-inline">
