@@ -35,14 +35,14 @@ caseSelect.addEventListener('change', function(){
         .then(data => {
             const resultRows = data.resultRows;
             const detailsData = data.detailsData;
-
+            // console.log("resultRows: "+resultRows); //[object Object]
             // 創建一個物件來存儲各個 caseseq 的 featureGroup
             const caseseqGroups = {};
 
             //將空間數據加到地圖
             resultRows.forEach((feature, index) => {
-
                 const geometry = JSON.parse(feature.geomjson);
+                // console.log("geometry: "+geometry);
                 let color;
                 // 根據 case 設置不同的顏色
                 if (feature.caseseq == selectedCase){
@@ -98,11 +98,27 @@ caseSelect.addEventListener('change', function(){
 
                 // 添加 GeoJSON 圖層到 featureGroup
                 geoJSONLayer.addTo(caseseqGroups[feature.caseseq]);
-
             });
+
+            // 計算包含子群組的座標
+            function calculateBounds(group) {
+                const groupBounds = L.latLngBounds();
+
+                group.eachLayer(layer => {
+                    if (layer instanceof L.LayerGroup) {
+                        groupBounds.extend(calculateBounds(layer));
+                    } else {
+                        groupBounds.extend(layer.getBounds());
+                    }
+                });
+
+                return groupBounds;
+            }
 
             // 將每個 caseseq 的 featureGroup 添加到 Layer Control
             Object.keys(caseseqGroups).forEach(caseseq => {
+                const groupBounds = calculateBounds(caseseqGroups[caseseq]);
+                
                 // 找到相應的 feature 對象
                 const correspondingFeature = detailsData.find(feature => feature.caseseq === parseInt(caseseq));
                 // 獲取 casename
@@ -124,12 +140,16 @@ caseSelect.addEventListener('change', function(){
                 // console.log("casecolor: "+casecolor);
 
                 layerControl.addOverlay(caseseqGroups[caseseq],casecolor+": "+casename);
+
+                // 使用 fitBounds 縮放地圖
+                map.fitBounds(groupBounds);
             });
     // }catch(error){
     //     console.error('Error fetching cases', error);
     // }
         });
     }, 100); // 這裡的 1000 表示延遲 1 秒，您可以根據實際需要調整延遲時間
+    
 });
 
 regionSelect.addEventListener('change',initMAP);
