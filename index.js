@@ -1,25 +1,34 @@
 const express = require('express'); // import express
 const { Pool } = require('pg'); // import pg module
 const app = express(); // initialize express
-// const port = 3000; //localhost
+
 // const port = process.env.PORT || 5000; //heroku
-// const host = 'localhost';
-// 配置 PostgreSQL 連接(localhost)
+const port = 3000; //8080
+const host = 'localhost';
+// 配置 PostgreSQL local-local
 // const pool = new Pool({
 //     user: 'ann',
-//     host: '150.116.67.217',
+//     host: 'localhost',
 //     database: 'flood',
 //     password: '0000',
 //     port: 5432, // PostgreSQL port
 // });
-const host = '34.16.148.196';
-const port = 8080;
-// 配置 PostgreSQL 連接(gcp)
+
+// 配置 PostgreSQL local-vm
+// const pool = new Pool({
+//     user: 'postgres',
+//     host: '34.171.145.183',
+//     database: 'gcp_flooddb',
+//     password: '',
+//     port: 5432, // PostgreSQL port
+// });
+
+// 配置 PostgreSQL vm-vm
 const pool = new Pool({
     user: 'postgres',
-    host: '34.31.70.151',
-    database: 'flooddb',
-    password: '0000',
+    host: 'localhost',
+    database: 'gcp_flooddb',
+    password: '',
     port: 5432, // PostgreSQL port
 });
 
@@ -68,8 +77,8 @@ app.get('/details', async (req, res) => {
         // console.log("selectedRadio: "+selectedRadio);
         let viewName;
         // Determine the view based on the selected radio button
-        if (selectedRadio === 'hr6') {
-            viewName = 'view_6hr_max';
+        if (selectedRadio === 'hr3') { // hr6
+            viewName = 'view_3hr_max'; // view_6hr_max
         } else if (selectedRadio === 'hr24') {
             viewName = 'view_24hr_max';
         } else {
