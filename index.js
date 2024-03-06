@@ -4,7 +4,7 @@ const app = express(); // initialize express
 
 // const port = process.env.PORT || 5000; //heroku
 const port = 3000; //8080
-const host = 'localhost';
+// const host = 'localhost';
 // 配置 PostgreSQL local-local
 // const pool = new Pool({
 //     user: 'ann',
@@ -22,7 +22,7 @@ const host = 'localhost';
 //     password: '',
 //     port: 5432, // PostgreSQL port
 // });
-
+const host = '34.171.145.183';
 // 配置 PostgreSQL vm-vm
 const pool = new Pool({
     user: 'postgres',
