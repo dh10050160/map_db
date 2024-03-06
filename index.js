@@ -3,7 +3,7 @@ const { Pool } = require('pg'); // import pg module
 const app = express(); // initialize express
 
 // const port = process.env.PORT || 5000; //heroku
-const port = 3000; //8080
+const port = 80;
 // const host = 'localhost';
 // 配置 PostgreSQL local-local
 // const pool = new Pool({
