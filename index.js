@@ -3,7 +3,7 @@ const { Pool } = require('pg'); // import pg module
 const app = express(); // initialize express
 
 // const port = process.env.PORT || 5000; //heroku
-// const port = 3000;
+const port = 3000;
 // const host = 'localhost';
 // // 配置 PostgreSQL local-local
 // const pool = new Pool({
@@ -139,6 +139,5 @@ app.get('/spatial', async (req, res) => {
 });
 
 app.listen(port, () => {
-    // console.log(`Server is running at http://${host}:${port}`); //localhost
-    console.log(`Server is running at http://${host}`); //vm
+    console.log(`Server is running at http://${host}:${port}`); //localhost
 });
