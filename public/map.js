@@ -48,7 +48,7 @@ caseSelect.addEventListener('change', function(){
                 if (feature.caseseq == selectedCase){
                     color = 'red';
                 }else if (feature.caseseq == detailsData[1].caseseq){
-                    color = 'orange';
+                    color = '#ff8200';
                 }else if (feature.caseseq == detailsData[2].caseseq){
                     color = 'blue';
                 }else if (feature.caseseq == detailsData[3].caseseq){
