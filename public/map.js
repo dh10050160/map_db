@@ -139,7 +139,11 @@ caseSelect.addEventListener('change', function(){
                 }
                 // console.log("casecolor: "+casecolor);
 
-                layerControl.addOverlay(caseseqGroups[caseseq],casecolor+": "+casename);
+                // 設定文字顏色
+                const coloredText = `<span style="color: ${casecolor}">${casecolor}: ${casename}</span>`;
+
+                // layerControl.addOverlay(caseseqGroups[caseseq],casecolor+": "+casename);
+                layerControl.addOverlay(caseseqGroups[caseseq],coloredText);
 
                 // 使用 fitBounds 縮放地圖
                 map.fitBounds(groupBounds);

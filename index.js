@@ -3,9 +3,9 @@ const { Pool } = require('pg'); // import pg module
 const app = express(); // initialize express
 
 // const port = process.env.PORT || 5000; //heroku
-const port = 3000;
+// const port = 3000;
 // const host = 'localhost';
-// 配置 PostgreSQL local-local
+// // 配置 PostgreSQL local-local
 // const pool = new Pool({
 //     user: 'ann',
 //     host: 'localhost',
@@ -77,8 +77,8 @@ app.get('/details', async (req, res) => {
         // console.log("selectedRadio: "+selectedRadio);
         let viewName;
         // Determine the view based on the selected radio button
-        if (selectedRadio === 'hr3') { // hr6
-            viewName = 'view_3hr_max'; // view_6hr_max
+        if (selectedRadio === 'hr3') { // hr3
+            viewName = 'view_3hr_max'; // view_3hr_max
         } else if (selectedRadio === 'hr24') {
             viewName = 'view_24hr_max';
         } else {
@@ -87,7 +87,7 @@ app.get('/details', async (req, res) => {
         }
         // console.log("viewName: "+viewName);
         const result = await pool.query(`
-            SELECT ${viewName}.casename,${viewName}.caseseq, hr1, hr3, hr6, hr12, hr24,depth,ROUND((R1.ha::NUMERIC),1) AS ha, ${viewName}.regioncode AS region
+            SELECT ${viewName}.casename,${viewName}.caseseq, hr1, hr3, hr6, hr12, hr24,depth,ROUND((R1.ha::NUMERIC),1) AS ha, ${viewName}.regioncode AS region,stationname
             FROM ${viewName},floodcase,(
                 SELECT regioncode,floodarea.caseseq,sum(ST_Area(geom::geography))/10000 as ha
                 FROM floodarea
@@ -139,5 +139,6 @@ app.get('/spatial', async (req, res) => {
 });
 
 app.listen(port, () => {
-    console.log(`Server is running at http://${host}:${port}`); //localhost
+    // console.log(`Server is running at http://${host}:${port}`); //localhost
+    console.log(`Server is running at http://${host}`); //vm
 });

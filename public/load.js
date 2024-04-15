@@ -139,7 +139,7 @@ caseSelect.addEventListener('change', function () {
     fetch(`/details?region=${selectedRegion}&case=${selectedCase}&compare=${selectedRadio}`)
         .then(response => response.json())
         .then(details => {
-            // console.log(details);
+            console.log(details);
             
             // console.log(details.length); // 4
             for (let i = 1; i <= details.length; i++) {
@@ -150,7 +150,7 @@ caseSelect.addEventListener('change', function () {
                 table.rows[i].cells[4].textContent = details[i-1].depth;
 
                 // Populate the chart with the retrieved details
-                myChart.data.datasets[i-1].label = details[i-1].casename;
+                myChart.data.datasets[i-1].label = details[i-1].casename+"("+details[i-1].stationname+")"; //增加雨量站名稱
                 myChart.data.datasets[i-1].data = [details[i-1].hr1, details[i-1].hr3, details[i-1].hr6, details[i-1].hr12, details[i-1].hr24];
             }
 
