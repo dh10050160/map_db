@@ -71,8 +71,9 @@ fetch('/regions')
     });
 });
 
-const regionSelect = document.getElementById('Region');
+const regionSelect = document.getElementById('Region'); 
 const caseSelect = document.getElementById('Case');
+const townSelect = document.getElementById('Town');
 
 // Event listener for region selection
 regionSelect.addEventListener('change', function () {
@@ -88,6 +89,7 @@ regionSelect.addEventListener('change', function () {
             // Clear existing options
             // console.log(data);
             caseSelect.innerHTML = '<option selected>Choose Case</option>';
+            townSelect.innerHTML = '<option selected>Choose Town</option>'; //初始化Town
 
             // Populate the "Choose Case" dropdown with the retrieved cases
             data.forEach(caseData => {
@@ -102,45 +104,67 @@ regionSelect.addEventListener('change', function () {
         .catch(error => console.error('Error fetching cases', error));
 });
 
-// Event listener for compare mode selection
-const compareRadioButtons = document.getElementsByName('compare');
-
-compareRadioButtons.forEach(button => {
-    button.addEventListener('change', function () {
-        const selectedRegion = regionSelect.value;
-        const selectedCase = caseSelect.value;
-
-        // Fetch details for the selected case in the selected region with the new compare mode
-        fetch(`/details?region=${selectedRegion}&case=${selectedCase}&compare=${button.value}`)
-            .then(response => response.json())
-            .then(details => {
-                // Update your page content, e.g., table and chart
-
-                // Trigger the spatial event
-                caseSelect.dispatchEvent(new Event('change'));
-            })
-            .catch(error => console.error('Error fetching case details', error));
-    });
-});
-
 // Event listener for case selection
 caseSelect.addEventListener('change', function () {
-    const selectedRegion = regionSelect.value;
-    const selectedCase = caseSelect.value;
-    const selectedRadio = document.querySelector('input[name="compare"]:checked').value;
-    // console.log("selectedRegion: "+selectedRegion);
-    // console.log("selectedCase: "+selectedCase);
-    // console.log("selectedRadio: "+selectedRadio);
+    const selectedRegion = regionSelect.value; //取得選取的region
+    const selectedCase = caseSelect.value; //取得選取的case
 
     const table = document.querySelector(".table")
     initTableAndChart(table,myChart);
 
-    // Fetch details for the selected case in the selected region
-    fetch(`/details?region=${selectedRegion}&case=${selectedCase}&compare=${selectedRadio}`)
+    // Fetch towns for the selected case in the selected region
+    fetch(`/towns?region=${selectedRegion}&case=${selectedCase}`)
+        .then(response => response.json())
+        .then(data => {
+            // console.log(data);
+            // Clear existing options
+            townSelect.innerHTML = '<option selected>Choose Town</option>';
+
+            // Populate the "Choose Town" dropdown with the retrieved towns
+            data.forEach(town => {
+                const option = document.createElement('option');
+                option.value = town.town;
+                option.text = town.town;
+                townSelect.appendChild(option);
+            });
+
+        })
+        .catch(error => console.error('Error fetching towns', error));
+});
+
+// Event listener for town selection
+townSelect.addEventListener('change', function () {
+    fetchDetails();
+});
+
+function fetchDetails() {
+    const selectedRegion = regionSelect.value;
+    const selectedCase = caseSelect.value;
+    const selectedTown = townSelect.value;
+    const selectedRadio = document.querySelector('input[name="compare"]:checked').value;
+    // console.log("selectedRegion: "+selectedRegion);
+    // console.log("selectedCase: "+selectedCase);
+    // console.log("selectedTown: "+selectedTown);
+    // console.log("selectedRadio: "+selectedRadio);
+
+    if (!selectedRegion || !selectedCase || !selectedTown || !selectedRadio) {
+        return; // 確保所有選項都被選取
+    }
+
+    console.log("Fetching details for:", {
+        selectedRegion,
+        selectedCase,
+        selectedTown,
+        selectedRadio
+    });
+
+    fetch(`/details?region=${selectedRegion}&case=${selectedCase}&town=${selectedTown}&compare=${selectedRadio}`)
         .then(response => response.json())
         .then(details => {
+            console.log("here");
             console.log(details);
-            
+
+            const table = document.querySelector(".table");
             // console.log(details.length); // 4
             for (let i = 1; i <= details.length; i++) {
                 // Populate the table with the retrieved details
@@ -157,6 +181,31 @@ caseSelect.addEventListener('change', function () {
             myChart.update();
         })
         .catch(error => console.error('Error fetching case details', error));
+}
+
+// Event listener for compare mode selection
+const compareRadioButtons = document.getElementsByName('compare');
+
+compareRadioButtons.forEach(button => {
+    button.addEventListener('change', function () {
+        fetchDetails();
+    //     const selectedRegion = regionSelect.value;
+    //     const selectedCase = caseSelect.value;
+    //     const selectedTown = townSelect.value;
+    //     console.log("here compare  compare");
+
+    //     // Fetch details for the selected case in the selected region with the new compare mode
+    //     fetch(`/details?region=${selectedRegion}&case=${selectedCase}&town=${selectedTown}&compare=${button.value}`)
+    //         .then(response => response.json())
+    //         .then(details => {
+    //             console.log(details);
+    //             // Update your page content, e.g., table and chart
+
+    //             // Trigger the spatial event
+    //             caseSelect.dispatchEvent(new Event('change'));
+    //         })
+    //         .catch(error => console.error('Error fetching case details', error));
+    });
 });
 
 function initTableAndChart(table,myChart) {
