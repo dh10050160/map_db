@@ -101,18 +101,40 @@ app.get('/details', async (req, res) => {
             selectedTown,
             selectedRadio
         });
-
+        let viewName;
         let compareMode;
         if (selectedRadio === 'hr3') {
             viewName = 'view_3hr_max';
             compareMode = 'hr3';
         } else if (selectedRadio === 'hr24') {
+            viewName = 'view_24hr_max';
             compareMode = 'hr24';
         } else {
+            viewName = 'view_24hr_max';
             compareMode = 'hr24';
         }
-        // console.log("compareMode: "+compareMode);
-        const result = await pool.query(`
+        console.log("viewName: "+viewName);
+        console.log("compareMode: "+compareMode);
+        
+        // 檢查有沒有選 town
+        if (selectedTown === 'Choose Town') {
+            result = await pool.query(`
+            SELECT ${viewName}.casename,${viewName}.caseseq, hr1, hr3, hr6, hr12, hr24,depth,ROUND((R1.ha::NUMERIC),1) AS ha, ${viewName}.regioncode AS region,stationname
+            FROM ${viewName},floodcase,(
+                SELECT regioncode,floodarea.caseseq,sum(ST_Area(geom::geography))/10000 as ha
+                FROM floodarea
+                GROUP BY regioncode,caseseq
+                ORDER BY regioncode,caseseq) R1
+            WHERE  ${viewName}.caseseq = floodcase.seq
+            AND R1.regioncode = ${viewName}.regioncode
+            AND R1.caseseq = ${viewName}.caseseq
+            AND ${viewName}.regioncode = $1
+            AND ${viewName}.caseseq <= $2
+            ORDER BY ABS(hr24 - (SELECT hr24 FROM ${viewName} WHERE regioncode = $1 AND caseseq = $2 ))
+            LIMIT 4;
+            `, [selectedRegion, selectedCase]);
+        } else {
+        result = await pool.query(`
         SELECT s.regioncode AS regioncode,s.caseseq AS caseseq,casename,stationname,stationcode, hr1, hr3, hr6, hr12, hr24, depth,town,ROUND((area_summary_view.ha::NUMERIC),1) AS ha
         FROM(
             SELECT rain.regioncode,rain.caseseq, rainstation.stationname,rain.stationcode, hr1, hr3, hr6, hr12, hr24, depth,rain.town,
@@ -141,7 +163,7 @@ app.get('/details', async (req, res) => {
         ))
         LIMIT 4
         `, [selectedRegion, selectedCase, selectedTown]);
-
+    }
         // 存儲數據到全局變量
         detailsData = result.rows;
         
@@ -154,6 +176,7 @@ app.get('/details', async (req, res) => {
 
 app.get('/spatial', async (req, res) => {
     try {
+        console.log("spatial spatial")
         // 等待 detailsData 數據更新
         await new Promise(resolve => setTimeout(resolve, 200)); // 延遲 ? 毫秒
 

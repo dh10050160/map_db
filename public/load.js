@@ -111,7 +111,7 @@ caseSelect.addEventListener('change', function () {
 
     const table = document.querySelector(".table")
     initTableAndChart(table,myChart);
-
+    fetchDetails();
     // Fetch towns for the selected case in the selected region
     fetch(`/towns?region=${selectedRegion}&case=${selectedCase}`)
         .then(response => response.json())
@@ -161,7 +161,6 @@ function fetchDetails() {
     fetch(`/details?region=${selectedRegion}&case=${selectedCase}&town=${selectedTown}&compare=${selectedRadio}`)
         .then(response => response.json())
         .then(details => {
-            console.log("here");
             console.log(details);
 
             const table = document.querySelector(".table");
