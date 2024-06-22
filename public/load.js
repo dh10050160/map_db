@@ -135,9 +135,12 @@ caseSelect.addEventListener('change', function () {
 // Event listener for town selection
 townSelect.addEventListener('change', function () {
     fetchDetails();
+    initTableAndChart(document.querySelector(".table"), myChart);
+    console.log("here townSelect 這裡這裡");
 });
 
 function fetchDetails() {
+
     const selectedRegion = regionSelect.value;
     const selectedCase = caseSelect.value;
     const selectedTown = townSelect.value;
