@@ -139,6 +139,34 @@ townSelect.addEventListener('change', function () {
     console.log("here townSelect 這裡這裡");
 });
 
+function formatTableNumbers() {
+    const table = document.querySelector('.table tbody');
+    const rows = table.querySelectorAll('tr');
+
+    rows.forEach(row => {
+        // 獲取<->最後三個<td>元素
+        const cells = row.querySelectorAll('td');
+        const lastThreeCells = [cells[cells.length - 3], cells[cells.length - 2], cells[cells.length - 1]];
+        lastThreeCells.forEach(cell => {
+            // 1.轉成浮點數2.格是化成小受點後一位
+            let num = parseFloat(cell.innerText);
+            if (!isNaN(num)) {
+                cell.innerText = num.toFixed(1);
+            }
+        });
+    });
+}
+
+// // 在DOM加載完成後調用formatTableNumbers初始化表格
+// document.addEventListener('DOMContentLoaded', (event) => {
+//     formatTableNumbers();
+// });
+
+// fetchDetails().then(() => {
+//     // 在 fetchDetails 完成後初始化表格
+//     formatTableNumbers();
+// });
+
 function fetchDetails() {
 
     const selectedRegion = regionSelect.value;
@@ -181,6 +209,9 @@ function fetchDetails() {
             }
 
             myChart.update();
+
+            // fetchDetails完成後調用formatTableNumbers初始化表格
+            formatTableNumbers();
         })
         .catch(error => console.error('Error fetching case details', error));
 }
