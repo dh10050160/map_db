@@ -92,7 +92,7 @@ function addSpatialDataToMap(resultRows, detailsData, selectedCase) {
             // 將 featureGroup 添加到地圖
             caseseqGroups[feature.caseseq].addTo(map);
         }
-        
+        console.log("hahaha= "+feature.ha);
         /*方法2*/
         const geoJSONLayer = L.geoJSON(geometry, {
             style: {
@@ -100,7 +100,7 @@ function addSpatialDataToMap(resultRows, detailsData, selectedCase) {
                 weight: 2,
                 opacity: 1
             }
-        }).bindPopup(feature.tag);
+        }).bindPopup("面積約: "+feature.ha.toFixed(3)+" 公頃");
 
         // 添加 GeoJSON 圖層到 featureGroup
         geoJSONLayer.addTo(caseseqGroups[feature.caseseq]);

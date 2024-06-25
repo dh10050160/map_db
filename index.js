@@ -188,7 +188,7 @@ app.get('/spatial', async (req, res) => {
         // console.log("detailsData: "+detailsData[0].caseseq);
         console.log("caseseqs: "+caseseqs);
         const result = await pool.query(`
-            select caseseq,tag,ST_AsGeoJSON(geom) as geomjson
+            select caseseq,tag,ST_AsGeoJSON(geom) as geomjson,ha
             from floodarea
             where regioncode = $1
             and caseseq IN (${caseseqs});
