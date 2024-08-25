@@ -123,8 +123,8 @@ caseSelect.addEventListener('change', function () {
             // Populate the "Choose Town" dropdown with the retrieved towns
             data.forEach(town => {
                 const option = document.createElement('option');
-                option.value = town.town;
-                option.text = town.town;
+                option.value = town.townname;
+                option.text = town.townname;
                 townSelect.appendChild(option);
             });
 

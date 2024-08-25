@@ -73,13 +73,15 @@ app.get('/towns', async (req, res) => {
         const selectedRegion = req.query.region;
         const selectedCase = req.query.case;
         const result = await pool.query(`
-            SELECT rain.town AS town,count(*)
-            FROM rain,rainstation
-            WHERE rain.stationcode = rainstation.stationcode
-            AND rain.regioncode = $1
+            SELECT town.townname AS townname,count(*) 
+            FROM rain,rainstation,town
+            WHERE rain.regioncode = $1
+            AND rain.stationcode = rainstation.stationcode
+            AND rain.seq = town.rain_seq 
             AND rain.caseseq = $2
-            GROUP BY town;
+            GROUP BY town.townname
         `, [selectedRegion, selectedCase]);
+        // console.log(result);
         res.json(result.rows);
     } catch (error) {
         console.error('Error executing query', error);
@@ -135,15 +137,16 @@ app.get('/details', async (req, res) => {
             `, [selectedRegion, selectedCase]);
         } else {
         result = await pool.query(`
-        SELECT s.regioncode AS regioncode,s.caseseq AS caseseq,casename,stationname,stationcode, hr1, hr3, hr6, hr12, hr24, depth,town,ROUND((area_summary_view.ha::NUMERIC),1) AS ha
+        SELECT s.regioncode AS regioncode,s.caseseq AS caseseq,casename,stationname,stationcode, hr1, hr3, hr6, hr12, hr24, depth,townname,rain_seq,ROUND((area_summary_view.ha::NUMERIC),1) AS ha
         FROM(
-            SELECT rain.regioncode,rain.caseseq, rainstation.stationname,rain.stationcode, hr1, hr3, hr6, hr12, hr24, depth,rain.town,
+            SELECT rain.regioncode,rain.caseseq, rainstation.stationname,rain.stationcode, hr1, hr3, hr6, hr12, hr24, depth,town.townname,town.rain_seq,
             ROW_NUMBER() OVER (PARTITION BY rain.caseseq ORDER BY rain.${compareMode} DESC) AS row_num
-            FROM rain,rainstation
+            FROM rain,rainstation,town
             WHERE rain.stationcode = rainstation.stationcode
+            AND rain.seq = town.rain_seq 
             AND rain.regioncode = $1
             AND rain.caseseq <= $2
-            AND rain.town = $3
+            AND town.townname = $3
         ) AS s, floodcase,area_summary_view
         WHERE s.caseseq = floodcase.seq 
         AND area_summary_view.regioncode = s.regioncode
@@ -153,10 +156,11 @@ app.get('/details', async (req, res) => {
             SELECT ${compareMode}
             FROM (
                 SELECT rain.${compareMode}
-                FROM rain
-                WHERE rain.regioncode = $1
+                FROM rain,town
+                WHERE rain.seq = town.rain_seq
+                AND rain.regioncode = $1
                 AND rain.caseseq = $2
-                AND rain.town = $3
+                AND town.townname = $3
                 ORDER BY  rain.${compareMode} DESC
                 LIMIT 1
             )
